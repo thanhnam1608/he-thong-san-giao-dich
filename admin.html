@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Bảng Điều Khiển Hệ Thống</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #090d16; color: #f8fafc; }
+    .panel { background: #111827; border: 1px solid rgba(148, 163, 184, 0.15); }
+  </style>
+</head>
+<body class="p-4 space-y-4">
+
+  <!-- CHẶN TRUY CẬP NGOÀI TELEGRAM -->
+  <div id="lock-screen" class="panel rounded-2xl p-6 text-center space-y-2 mt-10">
+    <p class="text-rose-400 font-bold text-sm">⛔ TRUY CẬP BỊ TỪ CHỐI</p>
+    <p class="text-xs text-slate-400">Đây là Bảng Điều Khiển nội bộ. Vui lòng mở trực tiếp từ nút Menu trong Bot Mẹ trên Telegram.</p>
+  </div>
+
+  <!-- GIAO DIỆN QUẢN LÝ CHÍNH -->
+  <div id="app-content" class="hidden space-y-4">
+    <div class="panel rounded-2xl p-4 flex items-center justify-between">
+      <div>
+        <p class="text-[11px] text-slate-400">Tài khoản điều hành</p>
+        <h1 id="u-name" class="font-bold text-base text-white">---</h1>
+      </div>
+      <span id="u-role" class="px-3 py-1 rounded-full text-xs font-extrabold bg-blue-600/20 text-blue-400 uppercase">---</span>
+    </div>
+
+    <!-- VÍ & TRẠNG THÁI -->
+    <div class="grid grid-cols-2 gap-3">
+      <div class="panel rounded-2xl p-4">
+        <p class="text-[11px] text-slate-400">Số dư khả dụng</p>
+        <p id="u-balance" class="font-extrabold text-lg text-emerald-400 mt-1">0đ</p>
+      </div>
+      <div class="panel rounded-2xl p-4">
+        <p class="text-[11px] text-slate-400">Xác minh Cọc uy tín</p>
+        <p id="u-deposit" class="font-bold text-sm text-amber-400 mt-1.5">---</p>
+      </div>
+    </div>
+
+    <!-- LINK TIẾP THỊ CTV -->
+    <div class="panel rounded-2xl p-4 space-y-2">
+      <p class="text-xs font-bold text-slate-200">🔗 Link Tiếp Thị Cửa Hàng (Gắn mã hoa hồng)</p>
+      <div class="flex gap-2">
+        <input id="ref-url" readonly class="w-full bg-slate-950 text-xs text-blue-300 px-3 py-2 rounded-xl border border-slate-800 outline-none" />
+        <button onclick="copyLink()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 rounded-xl shrink-0">Copy</button>
+      </div>
+    </div>
+
+    <!-- KHỐI ĐIỀU HÀNH DÀNH RIÊNG CHO ADMIN -->
+    <div id="admin-zone" class="hidden panel rounded-2xl p-4 space-y-3 border-blue-500/40">
+      <h2 class="text-xs font-extrabold text-blue-400 uppercase">👑 Trung Tâm Quản Trị Tối Cao</h2>
+      <p class="text-xs text-slate-300 leading-relaxed">Hệ thống đang kết nối trực tiếp với Supabase & Group Điều Hành. Toàn bộ đơn hàng mới, yêu cầu rút tiền và khiếu nại đều được đẩy về các Topic để duyệt 1 chạm.</p>
+      <div class="grid grid-cols-2 gap-2 pt-1">
+        <a href="https://supabase.com/dashboard" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-center py-2.5 rounded-xl text-xs font-semibold border border-slate-700">
+          🗄 Quản lý Kho & Shop
+        </a>
+        <a href="https://dash.cloudflare.com" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-center py-2.5 rounded-xl text-xs font-semibold border border-slate-700">
+          ⚙️ Nhật ký API
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "https://he-thong-tong-api.namalo1608.workers.dev";
+    const tg = window.Telegram?.WebApp;
+
+    async function boot() {
+      if (!tg || !tg.initData) return;
+      tg.ready();
+      tg.expand();
+
+      const res = await fetch(`${API_BASE}/api/miniapp/profile`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ initData: tg.initData })
+      });
+      const json = await res.json();
+      if (json.success && json.profile) {
+        const p = json.profile;
+        document.getElementById("lock-screen").classList.add("hidden");
+        document.getElementById("app-content").classList.remove("hidden");
+        document.getElementById("u-name").innerText = p.full_name || p.username || `ID ${p.telegram_id}`;
+        document.getElementById("u-role").innerText = p.role;
+        document.getElementById("u-balance").innerText = Number(p.available_balance || 0).toLocaleString() + "đ";
+        document.getElementById("u-deposit").innerText = p.is_deposit_verified ? "✅ Đã đóng cọc" : "⚠️ Chưa đóng cọc";
+        document.getElementById("ref-url").value = `${window.location.origin}/?ref=${p.ref_code}`;
+
+        if (p.role === "admin") {
+          document.getElementById("admin-zone").classList.remove("hidden");
+        }
+      }
+    }
+
+    function copyLink() {
+      const el = document.getElementById("ref-url");
+      el.select();
+      navigator.clipboard.writeText(el.value);
+      alert("Đã sao chép link giới thiệu!");
+    }
+
+    boot();
+  </script>
+</body>
+</html>
