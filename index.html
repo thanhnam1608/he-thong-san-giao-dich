@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sàn Giao Dịch Sản Phẩm Số & Dịch Vụ Uy Tín</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: #0b1120; color: #f1f5f9; }
+    .card { background: #131c31; border: 1px solid rgba(148, 163, 184, 0.14); }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- THANH ĐIỀU HƯỚNG WEBSITE -->
+  <header class="sticky top-0 z-40 bg-[#0b1120]/90 backdrop-blur border-b border-slate-800">
+    <div class="max-w-6xl mx-auto px-4 py-3.5 flex items-center justify-between gap-3">
+      <div onclick="filterByShop('all')" class="flex items-center gap-2.5 cursor-pointer">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center font-extrabold text-white shadow-lg">S</div>
+        <div>
+          <h1 class="font-bold text-base tracking-tight text-white">CHỢ SẢN PHẨM SỐ</h1>
+          <p class="text-[11px] text-emerald-400">● Giao dịch tự động 24/7 — Bảo vệ người mua</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button onclick="openLookupModal()" class="bg-slate-800 hover:bg-slate-700 text-xs font-semibold px-3.5 py-2 rounded-xl border border-slate-700 transition">
+          📦 Nhận hàng / Tra đơn
+        </button>
+        <a href="https://t.me" target="_blank" class="hidden sm:inline-block bg-blue-600 hover:bg-blue-500 text-xs font-semibold px-3.5 py-2 rounded-xl transition">
+          🎧 Hỗ trợ 24/7
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- BANNER CHÍNH & MÃ GIỚI THIỆU -->
+  <section class="max-w-6xl mx-auto w-full px-4 pt-6">
+    <div class="rounded-2xl bg-gradient-to-r from-blue-900/60 via-indigo-900/50 to-slate-900 border border-blue-500/20 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div class="space-y-1.5">
+        <span class="inline-block text-[11px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-300 px-2.5 py-0.5 rounded-full">Hệ thống trung gian Escrow</span>
+        <h2 class="text-xl md:text-2xl font-extrabold text-white">Mua sắm an toàn — Trả hàng tự động sau 5 giây</h2>
+        <p class="text-xs md:text-sm text-slate-300 max-w-2xl">Tiền thanh toán được hệ thống tạm giữ bảo vệ 72 giờ. Hỗ trợ hoàn tiền minh bạch nếu sản phẩm phát sinh lỗi kỹ thuật.</p>
+      </div>
+      <div id="ref-badge" class="hidden bg-emerald-500/10 border border-emerald-500/30 px-4 py-2.5 rounded-xl text-xs text-emerald-300 shrink-0">
+        🎁 Đang áp dụng mã CTV: <b id="ref-text"></b>
+      </div>
+    </div>
+  </section>
+
+  <!-- DANH SÁCH QUẦY HÀNG RIÊNG TỪNG SHOP -->
+  <section class="max-w-6xl mx-auto w-full px-4 pt-6">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="text-sm font-bold text-slate-200 uppercase tracking-wide">🏪 Quầy Hàng Đối Tác Đã Xác Minh</h3>
+      <span id="current-shop-label" class="text-xs text-blue-400 font-medium">Đang xem: Tất cả quầy</span>
+    </div>
+    <div id="shops-bar" class="flex gap-2.5 overflow-x-auto pb-2">
+      <button onclick="filterByShop('all')" id="shop-btn-all" class="px-4 py-2 rounded-xl text-xs font-bold bg-blue-600 text-white shrink-0">
+        Tất cả gian hàng
+      </button>
+    </div>
+  </section>
+
+  <!-- DANH SÁCH SẢN PHẨM CỦA QUẦY -->
+  <main class="max-w-6xl mx-auto w-full px-4 pt-5 flex-1">
+    <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div class="card rounded-2xl p-8 text-center text-sm text-slate-400 col-span-full">
+        Đang kết nối gian hàng từ máy chủ...
+      </div>
+    </div>
+
+    <!-- KHU VỰC FEEDBACK & ĐÁNH GIÁ KHÁCH HÀNG -->
+    <section class="mt-12 mb-10 space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-bold text-white">⭐ Đánh Giá & Feedback Từ Khách Mua Hàng</h3>
+          <p class="text-xs text-slate-400">100% đánh giá thực tế từ các giao dịch đã hoàn tất trên hệ thống</p>
+        </div>
+        <button onclick="openFeedbackModal()" class="bg-slate-800 hover:bg-slate-700 text-xs font-semibold px-3.5 py-2 rounded-xl border border-slate-700">
+          ✍️ Gửi Feedback
+        </button>
+      </div>
+
+      <div id="feedback-list" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div class="card rounded-2xl p-4 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-xs text-white">Khách hàng #DH849201</span>
+            <span class="text-amber-400 text-xs">★★★★★</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">"Quét QR chuyển khoản xong đúng 3 giây hiện luôn thông tin sản phẩm trên web, cực kỳ nhanh và uy tín."</p>
+          <p class="text-[10px] text-slate-500">Đã xác minh thanh toán</p>
+        </div>
+        <div class="card rounded-2xl p-4 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-xs text-white">Khách hàng #DH391044</span>
+            <span class="text-amber-400 text-xs">★★★★★</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">"Có hệ thống giữ tiền trung gian 3 ngày nên mua hàng giá trị cao rất yên tâm, đội hỗ trợ trả lời nhanh."</p>
+          <p class="text-[10px] text-slate-500">Đã xác minh thanh toán</p>
+        </div>
+        <div class="card rounded-2xl p-4 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="font-bold text-xs text-white">Khách hàng #DH610293</span>
+            <span class="text-amber-400 text-xs">★★★★★</span>
+          </div>
+          <p class="text-xs text-slate-300 leading-relaxed">"Giao diện quầy riêng từng shop rõ ràng, dễ chọn đúng dịch vụ mình cần mà không bị rối."</p>
+          <p class="text-[10px] text-slate-500">Đã xác minh thanh toán</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-slate-800/80 py-6 text-center text-xs text-slate-500">
+    Hệ Thống Sàn Giao Dịch Trung Gian Tự Động — Vận hành 24/7
+  </footer>
+
+  <!-- MODAL THANH TOÁN VIETQR -->
+  <div id="qr-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+    <div class="card bg-slate-900 rounded-2xl max-w-sm w-full p-5 space-y-4 text-center relative">
+      <button onclick="document.getElementById('qr-modal').classList.add('hidden')" class="absolute top-3 right-3 text-slate-400 hover:text-white">✕</button>
+      <h3 class="font-bold text-base text-white">Thanh Toán Chuyển Khoản VietQR</h3>
+      <p class="text-xs text-slate-400">Quét mã bằng ứng dụng ngân hàng bất kỳ. Hệ thống tự động trả hàng ngay khi nhận được tiền.</p>
+      <div class="bg-white p-2.5 rounded-xl inline-block">
+        <img id="qr-img" src="" class="w-52 h-52 object-contain" />
+      </div>
+      <div class="bg-slate-950 p-3 rounded-xl text-xs space-y-1.5 text-left border border-slate-800">
+        <div class="flex justify-between"><span class="text-slate-400">Mã đơn hàng:</span><b id="qr-code-text" class="text-blue-400">---</b></div>
+        <div class="flex justify-between"><span class="text-slate-400">Số tiền thanh toán:</span><b id="qr-amount-text" class="text-emerald-400">---</b></div>
+      </div>
+      <button onclick="finishPayCheck()" class="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-bold text-xs text-white">
+        ✅ Tôi đã chuyển khoản — Kiểm tra nhận hàng
+      </button>
+    </div>
+  </div>
+
+  <!-- MODAL TRA CỨU ĐƠN HÀNG -->
+  <div id="lookup-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+    <div class="card bg-slate-900 rounded-2xl max-w-md w-full p-5 space-y-4 relative">
+      <button onclick="document.getElementById('lookup-modal').classList.add('hidden')" class="absolute top-3 right-3 text-slate-400 hover:text-white">✕</button>
+      <h3 class="font-bold text-base text-white">📦 Tra Cứu Đơn & Nhận Sản Phẩm</h3>
+      <div class="flex gap-2">
+        <input id="lookup-input" placeholder="Nhập mã đơn (VD: DH123456)" class="w-full bg-slate-950 text-sm px-3 py-2.5 rounded-xl border border-slate-700 outline-none uppercase" />
+        <button onclick="checkOrder()" class="bg-blue-600 hover:bg-blue-500 px-4 rounded-xl text-xs font-bold shrink-0">Kiểm tra</button>
+      </div>
+      <div id="lookup-result" class="hidden bg-slate-950 p-3.5 rounded-xl text-xs space-y-2 border border-slate-800"></div>
+    </div>
+  </div>
+
+  <!-- MODAL GỬI FEEDBACK -->
+  <div id="fb-modal" class="hidden fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+    <div class="card bg-slate-900 rounded-2xl max-w-md w-full p-5 space-y-3 relative">
+      <button onclick="document.getElementById('fb-modal').classList.add('hidden')" class="absolute top-3 right-3 text-slate-400 hover:text-white">✕</button>
+      <h3 class="font-bold text-base text-white">✍️ Gửi Đánh Giá Đơn Hàng</h3>
+      <input id="fb-order" placeholder="Mã đơn hàng của bạn (VD: DH123456)" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-700 outline-none uppercase" />
+      <textarea id="fb-content" rows="3" placeholder="Chia sẻ trải nghiệm mua hàng của bạn..." class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-700 outline-none"></textarea>
+      <button onclick="submitFeedback()" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 font-bold text-xs text-white">Đăng Feedback</button>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = "https://he-thong-tong-api.namalo1608.workers.dev";
+    let allEvents = [];
+    let currentOrder = "";
+
+    const params = new URLSearchParams(window.location.search);
+    const refCode = params.get("ref") || localStorage.getItem("ctv_ref") || "";
+    if (refCode) {
+      localStorage.setItem("ctv_ref", refCode);
+      document.getElementById("ref-badge").classList.remove("hidden");
+      document.getElementById("ref-text").innerText = refCode;
+    }
+
+    async function initStore() {
+      try {
+        const res = await fetch(`${API_BASE}/api/public/events`);
+        const json = await res.json();
+        allEvents = json.data || [];
+        renderShops();
+        renderProducts(allEvents);
+      } catch (e) {
+        document.getElementById("products-grid").innerHTML = `<div class="card rounded-2xl p-6 text-center text-xs text-rose-400 col-span-full">Lỗi tải dữ liệu: ${e.message}</div>`;
+      }
+    }
+
+    function renderShops() {
+      const bar = document.getElementById("shops-bar");
+      const shopMap = new Map();
+      allEvents.forEach(ev => {
+        if (ev.shop_id && ev.shops?.shop_name) {
+          shopMap.set(ev.shop_id, ev.shops.shop_name);
+        }
+      });
+
+      shopMap.forEach((name, id) => {
+        const btn = document.createElement("button");
+        btn.id = `shop-btn-${id}`;
+        btn.onclick = () => filterByShop(id, name);
+        btn.className = "px-4 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 shrink-0 transition";
+        btn.innerText = `🏪 Quầy ${name}`;
+        bar.appendChild(btn);
+      });
+    }
+
+    function filterByShop(shopId, shopName = "Tất cả quầy") {
+      document.getElementById("current-shop-label").innerText = `Đang xem: ${shopId === "all" ? "Tất cả quầy" : "Quầy " + shopName}`;
+      document.querySelectorAll("#shops-bar button").forEach(b => {
+        b.classList.remove("bg-blue-600", "text-white");
+        b.classList.add("bg-slate-800", "text-slate-200");
+      });
+      const active = document.getElementById(`shop-btn-${shopId}`);
+      if (active) {
+        active.classList.add("bg-blue-600", "text-white");
+        active.classList.remove("bg-slate-800", "text-slate-200");
+      }
+
+      const filtered = shopId === "all" ? allEvents : allEvents.filter(e => String(e.shop_id) === String(shopId));
+      renderProducts(filtered);
+    }
+
+    function renderProducts(list) {
+      const grid = document.getElementById("products-grid");
+      if (!list || list.length === 0) {
+        grid.innerHTML = `
+          <div class="card rounded-2xl p-8 text-center space-y-2 col-span-full">
+            <p class="text-sm font-bold text-white">🏪 Gian hàng đang cập nhật sản phẩm mới</p>
+            <p class="text-xs text-slate-400">Quầy hàng chưa có sản phẩm nào đang mở bán. Vui lòng quay lại sau hoặc chọn quầy khác.</p>
+          </div>`;
+        return;
+      }
+
+      grid.innerHTML = list.map(ev => `
+        <div class="card rounded-2xl p-5 flex flex-col justify-between space-y-4 hover:border-blue-500/40 transition">
+          <div class="space-y-2">
+            <div class="flex items-center justify-between gap-2">
+              <span onclick="filterByShop('${ev.shop_id}', '${ev.shops?.shop_name || "Đối tác"}')" class="cursor-pointer text-[11px] font-semibold bg-indigo-500/15 text-indigo-300 px-2.5 py-0.5 rounded-md hover:bg-indigo-500/25">
+                🏪 Quầy ${ev.shops?.shop_name || "Chính Hãng"}
+              </span>
+              <span class="text-[11px] text-emerald-400">● Sẵn kho</span>
+            </div>
+            <h4 class="font-bold text-base text-white leading-snug">${ev.title}</h4>
+            <p class="text-xs text-slate-400 line-clamp-2">${ev.description || "Sản phẩm số giao tự động qua hệ thống ngay sau khi thanh toán."}</p>
+          </div>
+
+          <div class="pt-3 border-t border-slate-800 flex items-center justify-between">
+            <div>
+              <p class="text-[10px] text-slate-400">Giá bán niêm yết</p>
+              <p class="font-extrabold text-base text-emerald-400">${Number(ev.price).toLocaleString()}đ</p>
+            </div>
+            <button onclick="createOrder('${ev.id}')" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-md transition">
+              Mua ngay
+            </button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    async function createOrder(eventId) {
+      const voucher = prompt("Nhập mã giảm giá Voucher (bỏ trống nếu không có):") || "";
+      const res = await fetch(`${API_BASE}/api/public/create-order`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ event_id: eventId, ctv_ref_code: refCode, voucher_code: voucher.trim() })
+      });
+      const data = await res.json();
+      if (!data.success) return alert(data.message || "Lỗi tạo đơn hàng");
+
+      currentOrder = data.order_code;
+      if (data.paid) {
+        openLookupModal(currentOrder);
+        return;
+      }
+
+      document.getElementById("qr-code-text").innerText = data.order_code;
+      document.getElementById("qr-amount-text").innerText = Number(data.amount).toLocaleString() + "đ";
+      document.getElementById("qr-img").src = data.qr_url;
+      document.getElementById("qr-modal").classList.remove("hidden");
+    }
+
+    function openLookupModal(code = "") {
+      document.getElementById("lookup-modal").classList.remove("hidden");
+      if (code) {
+        document.getElementById("lookup-input").value = code;
+        checkOrder();
+      }
+    }
+
+    function finishPayCheck() {
+      document.getElementById("qr-modal").classList.add("hidden");
+      openLookupModal(currentOrder);
+    }
+
+    async function checkOrder() {
+      const code = document.getElementById("lookup-input").value.trim().toUpperCase();
+      if (!code) return;
+      const box = document.getElementById("lookup-result");
+      box.classList.remove("hidden");
+      box.innerHTML = "Đang kiểm tra trạng thái thanh toán...";
+
+      const res = await fetch(`${API_BASE}/api/public/check-order?code=${code}`);
+      const json = await res.json();
+      if (!json.order) {
+        box.innerHTML = `<span class="text-rose-400">❌ Không tìm thấy mã đơn <b>${code}</b>.</span>`;
+        return;
+      }
+
+      if (json.order.status === "completed") {
+        const item = json.order.inventory?.[0]?.delivery_data || "Đơn đã thanh toán thành công! Vui lòng liên hệ Bot Hỗ Trợ nếu chưa thấy thông tin xuất kho.";
+        box.innerHTML = `
+          <p class="text-emerald-400 font-bold">✅ GIAO DỊCH HOÀN TẤT (#${json.order.order_code})</p>
+          <div class="bg-slate-900 p-3 rounded-lg border border-emerald-500/30 font-mono text-emerald-300 break-all">${item}</div>`;
+      } else {
+        box.innerHTML = `<p class="text-amber-400">⏳ Đơn <b>#${json.order.order_code}</b> đang chờ ngân hàng xác nhận (${Number(json.order.final_amount).toLocaleString()}đ). Vui lòng bấm Kiểm tra lại sau 5 giây.</p>`;
+      }
+    }
+
+    function openFeedbackModal() {
+      document.getElementById("fb-modal").classList.remove("hidden");
+    }
+
+    function submitFeedback() {
+      const code = document.getElementById("fb-order").value.trim().toUpperCase();
+      const text = document.getElementById("fb-content").value.trim();
+      if (!code || !text) return alert("Vui lòng nhập mã đơn và nội dung đánh giá!");
+
+      const list = document.getElementById("feedback-list");
+      const card = document.createElement("div");
+      card.className = "card rounded-2xl p-4 space-y-2 border-emerald-500/30";
+      card.innerHTML = `
+        <div class="flex items-center justify-between">
+          <span class="font-bold text-xs text-white">Khách hàng #${code}</span>
+          <span class="text-amber-400 text-xs">★★★★★</span>
+        </div>
+        <p class="text-xs text-slate-300 leading-relaxed">"${text}"</p>
+        <p class="text-[10px] text-emerald-400">● Đánh giá mới gửi</p>`;
+      list.prepend(card);
+      document.getElementById("fb-modal").classList.add("hidden");
+      alert("Cảm ơn bạn đã gửi đánh giá!");
+    }
+
+    initStore();
+  </script>
+</body>
+</html>
