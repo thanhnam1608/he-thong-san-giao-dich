@@ -3,71 +3,312 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Bảng Điều Khiển Hệ Thống</title>
+  <title>Hệ Thống Điều Hành Trung Tâm</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #090d16; color: #f8fafc; }
-    .panel { background: #111827; border: 1px solid rgba(148, 163, 184, 0.15); }
+    * { -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #050811;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+
+    /* Nền cực quang chuyển động 3D */
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      overflow: hidden;
+      pointer-events: none;
+    }
+    .glow-circle {
+      position: absolute;
+      border-radius: 9999px;
+      filter: blur(75px);
+      opacity: 0.32;
+      animation: floatGlow 11s ease-in-out infinite alternate;
+    }
+    @keyframes floatGlow {
+      0% { transform: translate(-15px, -15px) scale(1); }
+      100% { transform: translate(35px, 30px) scale(1.18); }
+    }
+
+    /* Hiệu ứng thẻ kính phát sáng */
+    .glass {
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease;
+    }
+    .glass::before {
+      content: "";
+      position: absolute;
+      top: 0; left: -100%;
+      width: 50%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+      transform: skewX(-25deg);
+      animation: autoShine 6s infinite;
+      pointer-events: none;
+    }
+    @keyframes autoShine {
+      0%, 70% { left: -100%; }
+      100% { left: 160%; }
+    }
+
+    /* Chuyển tab mượt mà */
+    @keyframes tabFadeIn {
+      from { opacity: 0; transform: translateY(10px) scale(0.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .tab-view { animation: tabFadeIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+
+    /* Radar sóng xanh */
+    .live-dot {
+      width: 8px; height: 8px; border-radius: 9999px; background: #10b981;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulseGreen 1.8s infinite;
+    }
+    @keyframes pulseGreen {
+      70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    .nav-btn.active { color: #60a5fa; }
+    .nav-btn.active .nav-icon {
+      background: rgba(59, 130, 246, 0.2);
+      transform: translateY(-2px);
+    }
   </style>
 </head>
-<body class="p-4 space-y-4">
+<body class="pb-24">
 
-  <!-- CHẶN TRUY CẬP NGOÀI TELEGRAM -->
-  <div id="lock-screen" class="panel rounded-2xl p-6 text-center space-y-2 mt-10">
-    <p class="text-rose-400 font-bold text-sm">⛔ TRUY CẬP BỊ TỪ CHỐI</p>
-    <p class="text-xs text-slate-400">Đây là Bảng Điều Khiển nội bộ. Vui lòng mở trực tiếp từ nút Menu trong Bot Mẹ trên Telegram.</p>
+  <!-- NỀN HIỆU ỨNG -->
+  <div class="bg-mesh">
+    <div class="glow-circle bg-blue-600 w-72 h-72 -top-10 -left-10"></div>
+    <div class="glow-circle bg-indigo-600 w-72 h-72 bottom-10 -right-10" style="animation-delay: -5s"></div>
   </div>
 
-  <!-- GIAO DIỆN QUẢN LÝ CHÍNH -->
-  <div id="app-content" class="hidden space-y-4">
-    <div class="panel rounded-2xl p-4 flex items-center justify-between">
-      <div>
-        <p class="text-[11px] text-slate-400">Tài khoản điều hành</p>
-        <h1 id="u-name" class="font-bold text-base text-white">---</h1>
-      </div>
-      <span id="u-role" class="px-3 py-1 rounded-full text-xs font-extrabold bg-blue-600/20 text-blue-400 uppercase">---</span>
+  <!-- MÀN HÌNH KHÓA BẢO MẬT -->
+  <div id="lock-screen" class="p-6 mt-12">
+    <div class="glass rounded-2xl p-6 text-center space-y-2 border-rose-500/30">
+      <p class="text-rose-400 font-extrabold text-sm">⛔ KHU VỰC ĐIỀU HÀNH NỘI BỘ</p>
+      <p class="text-xs text-slate-400">Vui lòng mở bằng nút <b>Bảng Điều Khiển</b> trong Bot Mẹ trên Telegram.</p>
     </div>
+  </div>
 
-    <!-- VÍ & TRẠNG THÁI -->
-    <div class="grid grid-cols-2 gap-3">
-      <div class="panel rounded-2xl p-4">
-        <p class="text-[11px] text-slate-400">Số dư khả dụng</p>
-        <p id="u-balance" class="font-extrabold text-lg text-emerald-400 mt-1">0đ</p>
-      </div>
-      <div class="panel rounded-2xl p-4">
-        <p class="text-[11px] text-slate-400">Xác minh Cọc uy tín</p>
-        <p id="u-deposit" class="font-bold text-sm text-amber-400 mt-1.5">---</p>
-      </div>
-    </div>
+  <!-- TOÀN BỘ APP QUẢN LÝ -->
+  <div id="main-app" class="hidden">
 
-    <!-- LINK TIẾP THỊ CTV -->
-    <div class="panel rounded-2xl p-4 space-y-2">
-      <p class="text-xs font-bold text-slate-200">🔗 Link Tiếp Thị Cửa Hàng (Gắn mã hoa hồng)</p>
-      <div class="flex gap-2">
-        <input id="ref-url" readonly class="w-full bg-slate-950 text-xs text-blue-300 px-3 py-2 rounded-xl border border-slate-800 outline-none" />
-        <button onclick="copyLink()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-4 rounded-xl shrink-0">Copy</button>
+    <!-- HEADER CỐ ĐỊNH -->
+    <header class="sticky top-0 z-30 bg-[#050811]/85 backdrop-blur-xl border-b border-slate-800/80 px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center font-extrabold text-sm shadow-lg shadow-blue-600/30">
+          ZỊT
+        </div>
+        <div>
+          <h1 id="u-name" class="font-bold text-sm text-white leading-tight">---</h1>
+          <p class="text-[11px] text-emerald-400 flex items-center gap-1.5 mt-0.5">
+            <span class="live-dot"></span> Hệ thống trực tuyến
+          </p>
+        </div>
       </div>
-    </div>
+      <span id="u-role" class="px-3 py-1 rounded-full text-[11px] font-extrabold bg-blue-500/20 text-blue-400 border border-blue-400/20 uppercase">
+        ---
+      </span>
+    </header>
 
-    <!-- KHỐI ĐIỀU HÀNH DÀNH RIÊNG CHO ADMIN -->
-    <div id="admin-zone" class="hidden panel rounded-2xl p-4 space-y-3 border-blue-500/40">
-      <h2 class="text-xs font-extrabold text-blue-400 uppercase">👑 Trung Tâm Quản Trị Tối Cao</h2>
-      <p class="text-xs text-slate-300 leading-relaxed">Hệ thống đang kết nối trực tiếp với Supabase & Group Điều Hành. Toàn bộ đơn hàng mới, yêu cầu rút tiền và khiếu nại đều được đẩy về các Topic để duyệt 1 chạm.</p>
-      <div class="grid grid-cols-2 gap-2 pt-1">
-        <a href="https://supabase.com/dashboard" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-center py-2.5 rounded-xl text-xs font-semibold border border-slate-700">
-          🗄 Quản lý Kho & Shop
-        </a>
-        <a href="https://dash.cloudflare.com" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-center py-2.5 rounded-xl text-xs font-semibold border border-slate-700">
-          ⚙️ Nhật ký API
-        </a>
-      </div>
-    </div>
+    <!-- NỘI DUNG CÁC TAB -->
+    <main class="p-4 space-y-4">
+
+      <!-- TAB 1: TỔNG QUAN & VÍ -->
+      <section id="view-home" class="tab-view space-y-4">
+        <div class="rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 p-5 shadow-xl shadow-blue-900/30 space-y-3 relative overflow-hidden">
+          <div class="flex justify-between items-start">
+            <div>
+              <p class="text-xs text-blue-100/80">Số dư khả dụng trong ví</p>
+              <h2 id="u-balance" class="text-2xl font-extrabold text-white mt-0.5">0đ</h2>
+            </div>
+            <span id="u-deposit" class="text-[11px] font-bold bg-black/25 px-2.5 py-1 rounded-full text-emerald-300">
+              ---
+            </span>
+          </div>
+          <div class="pt-2 border-t border-white/15 flex gap-2">
+            <button onclick="switchTab('withdraw')" class="flex-1 bg-white text-blue-950 font-bold text-xs py-2 rounded-xl active:scale-95 transition">
+              💸 Rút tiền về Bank
+            </button>
+            <button onclick="switchTab('shop')" class="flex-1 bg-black/25 hover:bg-black/35 text-white font-semibold text-xs py-2 rounded-xl active:scale-95 transition">
+              ➕ Đăng sản phẩm
+            </button>
+          </div>
+        </div>
+
+        <!-- THỐNG KÊ NHANH -->
+        <div class="grid grid-cols-3 gap-2.5">
+          <div class="glass rounded-2xl p-3 text-center">
+            <p class="text-[10px] text-slate-400">Quầy hàng</p>
+            <p id="stat-shops" class="font-extrabold text-base text-white mt-0.5">0</p>
+          </div>
+          <div class="glass rounded-2xl p-3 text-center">
+            <p class="text-[10px] text-slate-400">Sản phẩm</p>
+            <p id="stat-events" class="font-extrabold text-base text-blue-400 mt-0.5">0</p>
+          </div>
+          <div class="glass rounded-2xl p-3 text-center">
+            <p class="text-[10px] text-slate-400">Đơn hoàn tất</p>
+            <p id="stat-orders" class="font-extrabold text-base text-emerald-400 mt-0.5">0</p>
+          </div>
+        </div>
+
+        <!-- LINK TIẾP THỊ CTV -->
+        <div class="glass rounded-2xl p-4 space-y-2">
+          <div class="flex items-center justify-between">
+            <p class="text-xs font-bold text-slate-200">🔗 Link Giới Thiệu Cửa Hàng (CTV)</p>
+            <span class="text-[10px] text-emerald-400">Tự tính hoa hồng</span>
+          </div>
+          <div class="flex gap-2">
+            <input id="ref-url" readonly class="w-full bg-slate-950/90 text-xs text-blue-300 px-3 py-2.5 rounded-xl border border-slate-800 outline-none" />
+            <button onclick="copyLink()" class="bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-xs font-bold px-4 rounded-xl shrink-0 transition">
+              Copy
+            </button>
+          </div>
+        </div>
+
+        <!-- PHÍM TẮT QUẢN TRỊ -->
+        <div class="glass rounded-2xl p-4 space-y-2.5">
+          <p class="text-xs font-bold text-slate-300 uppercase">⚡ Thao tác điều hành nhanh</p>
+          <div class="grid grid-cols-2 gap-2.5">
+            <button onclick="switchTab('stock')" class="bg-slate-800/80 hover:bg-slate-700 p-3 rounded-xl text-left space-y-1 border border-slate-700/70 active:scale-95 transition">
+              <p class="text-sm">📦</p>
+              <p class="text-xs font-bold text-white">Nạp Kho Hàng</p>
+              <p class="text-[10px] text-slate-400">Thêm Key / Tài khoản</p>
+            </button>
+            <button onclick="switchTab('voucher')" class="bg-slate-800/80 hover:bg-slate-700 p-3 rounded-xl text-left space-y-1 border border-slate-700/70 active:scale-95 transition">
+              <p class="text-sm">🎟</p>
+              <p class="text-xs font-bold text-white">Tạo Mã Giảm Giá</p>
+              <p class="text-[10px] text-slate-400">Khuyến mãi cho khách</p>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: QUẢN LÝ QUẦY SHOP & SẢN PHẨM -->
+      <section id="view-shop" class="hidden tab-view space-y-4">
+        <div class="glass rounded-2xl p-4 space-y-3">
+          <h2 class="text-sm font-bold text-white">🏪 Tạo Quầy Hàng Mới</h2>
+          <input id="new-shop-name" placeholder="Tên quầy hàng (VD: Quầy Netflix Premium)" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none focus:border-blue-500" />
+          <button onclick="createShop()" class="w-full bg-blue-600 hover:bg-blue-500 active:scale-95 py-2.5 rounded-xl text-xs font-bold text-white transition">
+            + Mở Quầy Hàng Ngay
+          </button>
+        </div>
+
+        <div class="glass rounded-2xl p-4 space-y-3">
+          <h2 class="text-sm font-bold text-white">🛍 Đăng Sản Phẩm Mới Lên Web</h2>
+          <select id="prod-shop-select" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none text-slate-200">
+            <option value="">-- Chọn quầy hàng sở hữu --</option>
+          </select>
+          <input id="prod-title" placeholder="Tên sản phẩm (VD: Tài khoản ChatGPT Plus 1 tháng)" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none focus:border-blue-500" />
+          <div class="grid grid-cols-2 gap-2">
+            <input id="prod-price" type="number" placeholder="Giá bán (VNĐ)" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none focus:border-blue-500" />
+            <input id="prod-ctv" type="number" placeholder="% Hoa hồng CTV (VD: 10)" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none focus:border-blue-500" />
+          </div>
+          <textarea id="prod-desc" rows="2" placeholder="Mô tả ngắn gọn về sản phẩm & bảo hành..." class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none focus:border-blue-500"></textarea>
+          <button onclick="createProduct()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 py-2.5 rounded-xl text-xs font-bold text-white transition">
+            🚀 Đăng Bán Lên Website
+          </button>
+        </div>
+
+        <div class="space-y-2">
+          <h3 class="text-xs font-bold text-slate-400 uppercase px-1">Danh sách sản phẩm đang mở bán</h3>
+          <div id="admin-products-list" class="space-y-2"></div>
+        </div>
+      </section>
+
+      <!-- TAB 3: NẠP KHO HÀNG TỰ ĐỘNG -->
+      <section id="view-stock" class="hidden tab-view space-y-4">
+        <div class="glass rounded-2xl p-4 space-y-3">
+          <h2 class="text-sm font-bold text-white">📦 Nạp Dữ Liệu Xuất Kho Tự Động</h2>
+          <p class="text-[11px] text-slate-400">Mỗi dòng tương ứng với 1 sản phẩm giao cho 1 khách (VD: <code class="text-blue-300">email@gmail.com | pass123</code> hoặc mã Key kích hoạt).</p>
+          <select id="stock-product-select" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none text-slate-200">
+            <option value="">-- Chọn sản phẩm cần nạp kho --</option>
+          </select>
+          <textarea id="stock-items" rows="6" placeholder="Dán danh sách tài khoản / key vào đây (mỗi dòng 1 cái)..." class="w-full bg-slate-950 font-mono text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none focus:border-blue-500"></textarea>
+          <button onclick="uploadStock()" class="w-full bg-blue-600 hover:bg-blue-500 active:scale-95 py-2.5 rounded-xl text-xs font-bold text-white transition">
+            📥 Nạp Vào Kho Ngay
+          </button>
+        </div>
+      </section>
+
+      <!-- TAB 4: RÚT TIỀN & ĐỐI SOÁT -->
+      <section id="view-withdraw" class="hidden tab-view space-y-4">
+        <div class="glass rounded-2xl p-4 space-y-3">
+          <h2 class="text-sm font-bold text-white">💸 Tạo Lệnh Rút Tiền Về Ngân Hàng</h2>
+          <p class="text-[11px] text-slate-400">Lệnh rút sẽ được đẩy ngay vào phòng <b>Rút Tiền</b> trên Group Điều Hành để duyệt chuyển khoản.</p>
+          <input id="wd-amount" type="number" placeholder="Số tiền muốn rút (VD: 200000)" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none focus:border-blue-500" />
+          <input id="wd-bank" placeholder="Ngân hàng + Số TK + Tên chủ TK" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none focus:border-blue-500" />
+          <button onclick="requestWithdraw()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 py-2.5 rounded-xl text-xs font-bold text-white transition">
+            Gửi Yêu Cầu Rút Tiền
+          </button>
+        </div>
+      </section>
+
+      <!-- TAB 5: TẠO MÃ VOUCHER GIẢM GIÁ -->
+      <section id="view-voucher" class="hidden tab-view space-y-4">
+        <div class="glass rounded-2xl p-4 space-y-3">
+          <h2 class="text-sm font-bold text-white">🎟 Phát Hành Mã Giảm Giá (Voucher)</h2>
+          <input id="vc-code" placeholder="Mã giảm giá (VD: KHAI_TRUONG)" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none uppercase focus:border-blue-500" />
+          <div class="grid grid-cols-2 gap-2">
+            <input id="vc-discount" type="number" placeholder="Số tiền giảm (VNĐ)" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none focus:border-blue-500" />
+            <input id="vc-limit" type="number" placeholder="Số lượt dùng (VD: 50)" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none focus:border-blue-500" />
+          </div>
+          <button onclick="createVoucher()" class="w-full bg-violet-600 hover:bg-violet-500 active:scale-95 py-2.5 rounded-xl text-xs font-bold text-white transition">
+            ✨ Kích Hoạt Mã Voucher
+          </button>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- THANH MENU APP DƯỚI ĐÁY -->
+    <nav class="fixed bottom-0 inset-x-0 z-40 bg-[#080d1a]/95 backdrop-blur-xl border-t border-slate-800/90 px-2 py-1.5 flex justify-around">
+      <button onclick="switchTab('home')" id="nav-home" class="nav-btn active flex flex-col items-center gap-0.5 py-1 px-3 text-slate-400">
+        <span class="nav-icon px-3 py-1 rounded-xl text-sm transition">📊</span>
+        <span class="text-[10px] font-semibold">Tổng quan</span>
+      </button>
+      <button onclick="switchTab('shop')" id="nav-shop" class="nav-btn flex flex-col items-center gap-0.5 py-1 px-3 text-slate-400">
+        <span class="nav-icon px-3 py-1 rounded-xl text-sm transition">🏪</span>
+        <span class="text-[10px] font-semibold">Quầy Shop</span>
+      </button>
+      <button onclick="switchTab('stock')" id="nav-stock" class="nav-btn flex flex-col items-center gap-0.5 py-1 px-3 text-slate-400">
+        <span class="nav-icon px-3 py-1 rounded-xl text-sm transition">📦</span>
+        <span class="text-[10px] font-semibold">Kho hàng</span>
+      </button>
+      <button onclick="switchTab('withdraw')" id="nav-withdraw" class="nav-btn flex flex-col items-center gap-0.5 py-1 px-3 text-slate-400">
+        <span class="nav-icon px-3 py-1 rounded-xl text-sm transition">💸</span>
+        <span class="text-[10px] font-semibold">Rút tiền</span>
+      </button>
+      <button onclick="switchTab('voucher')" id="nav-voucher" class="nav-btn flex flex-col items-center gap-0.5 py-1 px-3 text-slate-400">
+        <span class="nav-icon px-3 py-1 rounded-xl text-sm transition">🎟</span>
+        <span class="text-[10px] font-semibold">Voucher</span>
+      </button>
+    </nav>
   </div>
 
   <script>
     const API_BASE = "https://he-thong-tong-api.namalo1608.workers.dev";
     const tg = window.Telegram?.WebApp;
+
+    function switchTab(tab) {
+      tg?.HapticFeedback?.selectionChanged();
+      ["home", "shop", "stock", "withdraw", "voucher"].forEach(t => {
+        document.getElementById(`view-${t}`).classList.add("hidden");
+        document.getElementById(`nav-${t}`).classList.remove("active");
+      });
+      document.getElementById(`view-${tab}`).classList.remove("hidden");
+      document.getElementById(`nav-${tab}`).classList.add("active");
+    }
 
     async function boot() {
       if (!tg || !tg.initData) return;
@@ -83,24 +324,117 @@
       if (json.success && json.profile) {
         const p = json.profile;
         document.getElementById("lock-screen").classList.add("hidden");
-        document.getElementById("app-content").classList.remove("hidden");
+        document.getElementById("main-app").classList.remove("hidden");
         document.getElementById("u-name").innerText = p.full_name || p.username || `ID ${p.telegram_id}`;
         document.getElementById("u-role").innerText = p.role;
         document.getElementById("u-balance").innerText = Number(p.available_balance || 0).toLocaleString() + "đ";
         document.getElementById("u-deposit").innerText = p.is_deposit_verified ? "✅ Đã đóng cọc" : "⚠️ Chưa đóng cọc";
         document.getElementById("ref-url").value = `${window.location.origin}/?ref=${p.ref_code}`;
 
-        if (p.role === "admin") {
-          document.getElementById("admin-zone").classList.remove("hidden");
-        }
+        loadAdminData();
       }
+    }
+
+    async function loadAdminData() {
+      try {
+        const res = await fetch(`${API_BASE}/api/public/events`);
+        const json = await res.json();
+        const events = json.data || [];
+        document.getElementById("stat-events").innerText = events.length;
+
+        const shopSelect = document.getElementById("prod-shop-select");
+        const stockSelect = document.getElementById("stock-product-select");
+        const prodList = document.getElementById("admin-products-list");
+
+        const shops = new Map();
+        events.forEach(e => {
+          if (e.shop_id && e.shops?.shop_name) shops.set(e.shop_id, e.shops.shop_name);
+        });
+        document.getElementById("stat-shops").innerText = shops.size;
+
+        shopSelect.innerHTML = `<option value="">-- Chọn quầy hàng --</option>`;
+        shops.forEach((name, id) => {
+          shopSelect.innerHTML += `<option value="${id}">${name}</option>`;
+        });
+
+        stockSelect.innerHTML = `<option value="">-- Chọn sản phẩm cần nạp kho --</option>` +
+          events.map(e => `<option value="${e.id}">${e.title} (${Number(e.price).toLocaleString()}đ)</option>`).join("");
+
+        prodList.innerHTML = events.length ? events.map(e => `
+          <div class="glass rounded-xl p-3 flex justify-between items-center">
+            <div>
+              <p class="text-xs font-bold text-white">${e.title}</p>
+              <p class="text-[10px] text-slate-400">Quầy: ${e.shops?.shop_name || "Chính hãng"}</p>
+            </div>
+            <span class="text-xs font-extrabold text-emerald-400">${Number(e.price).toLocaleString()}đ</span>
+          </div>
+        `).join("") : `<p class="text-xs text-slate-500 text-center py-4">Chưa có sản phẩm nào.</p>`;
+      } catch (err) {}
+    }
+
+    async function callAdminApi(endpoint, payload) {
+      tg?.HapticFeedback?.impactOccurred("medium");
+      const res = await fetch(`${API_BASE}${endpoint}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ initData: tg.initData, ...payload })
+      });
+      return await res.json();
+    }
+
+    async function createShop() {
+      const shop_name = document.getElementById("new-shop-name").value.trim();
+      if (!shop_name) return alert("Nhập tên quầy hàng!");
+      const res = await callAdminApi("/api/miniapp/create-shop", { shop_name });
+      alert(res.message || (res.success ? "Đã mở quầy hàng thành công!" : "Cần cập nhật route API trên Worker"));
+      if (res.success) { document.getElementById("new-shop-name").value = ""; loadAdminData(); }
+    }
+
+    async function createProduct() {
+      const shop_id = document.getElementById("prod-shop-select").value;
+      const title = document.getElementById("prod-title").value.trim();
+      const price = Number(document.getElementById("prod-price").value);
+      const ctv_commission_percent = Number(document.getElementById("prod-ctv").value || 0);
+      const description = document.getElementById("prod-desc").value.trim();
+      if (!title || !price) return alert("Vui lòng nhập tên và giá sản phẩm!");
+      const res = await callAdminApi("/api/miniapp/create-event", { shop_id, title, price, ctv_commission_percent, description });
+      alert(res.message || (res.success ? "Đã đăng bán sản phẩm!" : "Cần cập nhật route API trên Worker"));
+      if (res.success) loadAdminData();
+    }
+
+    async function uploadStock() {
+      const event_id = document.getElementById("stock-product-select").value;
+      const raw = document.getElementById("stock-items").value.trim();
+      if (!event_id || !raw) return alert("Chọn sản phẩm và nhập dữ liệu kho!");
+      const items = raw.split("\n").map(s => s.trim()).filter(Boolean);
+      const res = await callAdminApi("/api/miniapp/add-inventory", { event_id, items });
+      alert(res.message || (res.success ? `Đã nạp ${items.length} sản phẩm vào kho!` : "Cần cập nhật route API trên Worker"));
+      if (res.success) document.getElementById("stock-items").value = "";
+    }
+
+    async function requestWithdraw() {
+      const amount = Number(document.getElementById("wd-amount").value);
+      const bank_info = document.getElementById("wd-bank").value.trim();
+      if (!amount || !bank_info) return alert("Nhập đủ số tiền và thông tin ngân hàng!");
+      const res = await callAdminApi("/api/miniapp/withdraw", { amount, bank_info });
+      alert(res.message || (res.success ? "Đã gửi lệnh rút tiền về Group Điều Hành!" : "Cần cập nhật route API trên Worker"));
+    }
+
+    async function createVoucher() {
+      const code = document.getElementById("vc-code").value.trim().toUpperCase();
+      const discount_amount = Number(document.getElementById("vc-discount").value);
+      const max_uses = Number(document.getElementById("vc-limit").value || 50);
+      if (!code || !discount_amount) return alert("Nhập mã và số tiền giảm!");
+      const res = await callAdminApi("/api/miniapp/create-voucher", { code, discount_amount, max_uses });
+      alert(res.message || (res.success ? "Đã tạo mã giảm giá!" : "Cần cập nhật route API trên Worker"));
     }
 
     function copyLink() {
       const el = document.getElementById("ref-url");
       el.select();
       navigator.clipboard.writeText(el.value);
-      alert("Đã sao chép link giới thiệu!");
+      tg?.HapticFeedback?.notificationOccurred("success");
+      alert("Đã sao chép link tiếp thị!");
     }
 
     boot();
