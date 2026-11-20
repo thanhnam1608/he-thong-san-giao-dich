@@ -8,48 +8,23 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     * { -webkit-tap-highlight-color: transparent; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: #040710;
-      color: #f8fafc;
-      overflow-x: hidden;
-    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #040710; color: #f8fafc; overflow-x: hidden; }
     .aurora { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
     .orb { position: absolute; border-radius: 9999px; filter: blur(85px); opacity: 0.3; animation: drift 12s ease-in-out infinite alternate; }
     @keyframes drift { 0% { transform: translate(-20px, -15px) scale(1); } 100% { transform: translate(35px, 25px) scale(1.15); } }
-
-    .glass {
-      background: rgba(15, 23, 42, 0.78);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(148, 163, 184, 0.14);
-      position: relative;
-      overflow: hidden;
-    }
-    .glass::before {
-      content: ""; position: absolute; top: 0; left: -120%; width: 55%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
-      transform: skewX(-24deg); animation: shine 6s infinite; pointer-events: none;
-    }
-    @keyframes shine { 0%, 70% { left: -120%; } 100% { left: 160%; } }
-
-    @keyframes popIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-    .view-anim { animation: popIn 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-
-    .live-dot { width: 8px; height: 8px; border-radius: 9999px; background: #10b981; animation: pingDot 1.8s infinite; }
-    @keyframes pingDot { 0% { box-shadow: 0 0 0 0 rgba(16,185,129,0.7); } 70% { box-shadow: 0 0 0 8px rgba(16,185,129,0); } 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); } }
-
+    .glass { background: rgba(15, 23, 42, 0.78); backdrop-filter: blur(16px); border: 1px solid rgba(148, 163, 184, 0.14); position: relative; overflow: hidden; }
+    @keyframes popIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .view-anim { animation: popIn 0.25s ease-out forwards; }
     .nav-item.active { color: #60a5fa; }
     .nav-item.active .ico { background: rgba(59, 130, 246, 0.22); transform: translateY(-2px); }
   </style>
 </head>
 <body class="pb-24">
-
   <div class="aurora">
     <div class="orb bg-blue-600 w-72 h-72 -top-10 -left-10"></div>
     <div class="orb bg-violet-600 w-72 h-72 bottom-12 -right-10" style="animation-delay:-5s"></div>
   </div>
 
-  <!-- KHÓA BẢO MẬT -->
   <div id="lock-screen" class="p-6 mt-12">
     <div class="glass rounded-2xl p-6 text-center space-y-2 border-rose-500/30">
       <p class="text-rose-400 font-extrabold text-sm">⛔ KHU VỰC ĐIỀU HÀNH HỆ THỐNG</p>
@@ -57,248 +32,164 @@
     </div>
   </div>
 
-  <!-- GIAO DIỆN MASTER APP -->
   <div id="app" class="hidden">
-
-    <!-- TOP BAR -->
     <header class="sticky top-0 z-30 bg-[#040710]/85 backdrop-blur-xl border-b border-slate-800/80 px-4 py-3 flex items-center justify-between">
       <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-violet-600 flex items-center justify-center font-extrabold text-[11px] shadow-lg shadow-blue-600/30">
-          MASTER
-        </div>
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-violet-600 flex items-center justify-center font-extrabold text-[11px]">MASTER</div>
         <div>
           <h1 id="u-name" class="font-bold text-sm text-white leading-tight">---</h1>
-          <p class="text-[11px] text-emerald-400 flex items-center gap-1.5 mt-0.5">
-            <span class="live-dot"></span> Giám sát trực tuyến 24/7
-          </p>
+          <p class="text-[11px] text-emerald-400 mt-0.5">● Hệ thống đồng bộ 24/7</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <button onclick="refreshAll()" class="bg-slate-800 hover:bg-slate-700 active:scale-90 p-2 rounded-xl text-xs border border-slate-700" title="Cập nhật dữ liệu">🔄</button>
-        <span id="u-role" class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-blue-500/20 text-blue-400 border border-blue-400/20 uppercase">---</span>
+        <button onclick="refreshAll()" class="bg-slate-800 active:scale-90 p-2 rounded-xl text-xs border border-slate-700">🔄</button>
+        <span id="u-role" class="px-2.5 py-1 rounded-full text-[11px] font-extrabold bg-blue-500/20 text-blue-400 uppercase">---</span>
       </div>
     </header>
 
     <main class="p-4 space-y-4">
-
-      <!-- 1. TAB TỔNG QUAN & DOANH THU SÀN -->
+      <!-- 1. TỔNG QUAN -->
       <section id="tab-overview" class="view-anim space-y-4">
         <div class="rounded-2xl bg-gradient-to-br from-blue-600 via-indigo-600 to-violet-700 p-5 shadow-xl space-y-3">
           <div class="flex justify-between items-start">
             <div>
               <p class="text-xs text-blue-100/80">Tổng doanh thu toàn hệ thống</p>
               <h2 id="st-total-rev" class="text-2xl font-extrabold text-white mt-0.5">0đ</h2>
-              <p class="text-[11px] text-blue-100/90 mt-1">Ví cá nhân của bạn: <b id="u-balance" class="text-emerald-300">0đ</b></p>
+              <p class="text-[11px] text-blue-100/90 mt-1">Ví cá nhân: <b id="u-balance" class="text-emerald-300">0đ</b></p>
             </div>
             <span id="u-deposit" class="text-[11px] font-bold bg-black/25 px-2.5 py-1 rounded-full text-emerald-300">---</span>
           </div>
           <div class="grid grid-cols-4 gap-1.5 pt-2 border-t border-white/15 text-center">
-            <div class="bg-black/20 rounded-xl py-2">
-              <p class="text-[10px] text-blue-100/75">Nhân sự</p>
-              <p id="st-users" class="font-extrabold text-sm text-white">0</p>
-            </div>
-            <div class="bg-black/20 rounded-xl py-2">
-              <p class="text-[10px] text-blue-100/75">Quầy Shop</p>
-              <p id="st-shops" class="font-extrabold text-sm text-white">0</p>
-            </div>
-            <div class="bg-black/20 rounded-xl py-2">
-              <p class="text-[10px] text-blue-100/75">Tồn kho</p>
-              <p id="st-stock" class="font-extrabold text-sm text-amber-300">0</p>
-            </div>
-            <div class="bg-black/20 rounded-xl py-2">
-              <p class="text-[10px] text-blue-100/75">Đơn xong</p>
-              <p id="st-orders" class="font-extrabold text-sm text-emerald-300">0</p>
-            </div>
+            <div class="bg-black/20 rounded-xl py-2"><p class="text-[10px] text-blue-100/75">Nhân sự</p><p id="st-users" class="font-extrabold text-sm">0</p></div>
+            <div class="bg-black/20 rounded-xl py-2"><p class="text-[10px] text-blue-100/75">Quầy Shop</p><p id="st-shops" class="font-extrabold text-sm">0</p></div>
+            <div class="bg-black/20 rounded-xl py-2"><p class="text-[10px] text-blue-100/75">Tồn kho</p><p id="st-stock" class="font-extrabold text-sm text-amber-300">0</p></div>
+            <div class="bg-black/20 rounded-xl py-2"><p class="text-[10px] text-blue-100/75">Đơn xong</p><p id="st-orders" class="font-extrabold text-sm text-emerald-300">0</p></div>
           </div>
         </div>
 
-        <!-- LINK TIẾP THỊ CTV -->
         <div class="glass rounded-2xl p-4 space-y-2">
-          <div class="flex justify-between items-center">
-            <p class="text-xs font-bold text-slate-200">🔗 Link Tiếp Thị Liên Kết (CTV / Tuyển Ref)</p>
-            <span class="text-[10px] text-emerald-400">Tự chia hoa hồng</span>
-          </div>
+          <p class="text-xs font-bold text-slate-200">🔗 Link Tiếp Thị Liên Kết (CTV)</p>
           <div class="flex gap-2">
             <input id="ref-url" readonly class="w-full bg-slate-950 text-xs text-blue-300 px-3 py-2.5 rounded-xl border border-slate-800 outline-none" />
-            <button onclick="copyRef()" class="bg-blue-600 hover:bg-blue-500 active:scale-95 text-white text-xs font-bold px-4 rounded-xl shrink-0">Copy</button>
+            <button onclick="copyRef()" class="bg-blue-600 active:scale-95 text-white text-xs font-bold px-4 rounded-xl shrink-0">Copy</button>
           </div>
         </div>
 
-        <!-- BẢNG XẾP HẠNG DOANH THU TỪNG NGƯỜI (TOP CTV & SHOP) -->
+        <!-- ĐƠN THỦ CÔNG CHỜ BÀN GIAO (CANVA PRO / CODE THEO YÊU CẦU) -->
+        <div class="glass rounded-2xl p-4 space-y-2.5 border-amber-500/30">
+          <h3 class="text-xs font-bold text-amber-400 uppercase">🛠 Đơn Nâng Cấp / Giao File Chờ Bàn Giao</h3>
+          <div id="processing-orders-list" class="space-y-2"></div>
+        </div>
+
         <div class="admin-only hidden glass rounded-2xl p-4 space-y-2.5">
-          <div class="flex items-center justify-between">
-            <h3 class="text-xs font-bold text-amber-400 uppercase">🏆 Bảng Doanh Thu Từng Thành Viên</h3>
-            <button onclick="goTab('users')" class="text-[11px] text-blue-400 underline">Xem tất cả →</button>
-          </div>
+          <h3 class="text-xs font-bold text-emerald-400 uppercase">🏆 Top Doanh Thu Thành Viên</h3>
           <div id="top-earners-list" class="space-y-2"></div>
         </div>
-
-        <!-- LỐI TẮT ĐIỀU HÀNH -->
-        <div class="grid grid-cols-2 gap-2.5">
-          <button onclick="goTab('activity')" class="admin-only hidden glass rounded-2xl p-3.5 text-left space-y-1 hover:border-cyan-500/40 active:scale-95 transition">
-            <span class="text-lg">📡</span>
-            <p class="text-xs font-bold text-white">Nhật Ký Hoạt Động</p>
-            <p class="text-[10px] text-slate-400">Soi mọi biến động đơn, ví, user</p>
-          </button>
-          <button onclick="goTab('users')" class="admin-only hidden glass rounded-2xl p-3.5 text-left space-y-1 hover:border-blue-500/40 active:scale-95 transition">
-            <span class="text-lg">👥</span>
-            <p class="text-xs font-bold text-white">Quản Lý CTV & Shop</p>
-            <p class="text-[10px] text-slate-400">Doanh số từng người, đổi quyền</p>
-          </button>
-          <button onclick="goTab('shops')" class="glass rounded-2xl p-3.5 text-left space-y-1 hover:border-indigo-500/40 active:scale-95 transition">
-            <span class="text-lg">🏪</span>
-            <p class="text-xs font-bold text-white">Quầy Shop & Sản Phẩm</p>
-            <p class="text-[10px] text-slate-400">Mở quầy, đăng bán, kiểm tồn kho</p>
-          </button>
-          <button onclick="goTab('finance')" class="glass rounded-2xl p-3.5 text-left space-y-1 hover:border-emerald-500/40 active:scale-95 transition">
-            <span class="text-lg">🏦</span>
-            <p class="text-xs font-bold text-white">Dòng Tiền & Rút Tiền</p>
-            <p class="text-[10px] text-slate-400">Duyệt rút, đối soát đơn hàng</p>
-          </button>
-        </div>
       </section>
 
-      <!-- 2. TAB NHẬT KÝ HOẠT ĐỘNG HỆ THỐNG (LIVE LOGS) -->
+      <!-- 2. NHẬT KÝ HOẠT ĐỘNG -->
       <section id="tab-activity" class="hidden view-anim space-y-4">
         <div class="glass rounded-2xl p-4 space-y-3">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-sm font-bold text-white">📡 Nhật Ký Hoạt Động Toàn Sàn</h2>
-              <p class="text-[11px] text-slate-400">Ghi nhận mọi đơn hàng, biến động ví, rút tiền & đăng ký mới</p>
-            </div>
-            <button onclick="refreshAll()" class="bg-blue-600/20 text-blue-400 px-2.5 py-1 rounded-lg text-[11px] font-bold">Làm mới</button>
-          </div>
-          <div id="activity-feed" class="space-y-2 max-h-[70vh] overflow-y-auto pr-1">
-            <p class="text-xs text-slate-400 text-center py-6">Đang tải luồng hoạt động...</p>
-          </div>
+          <h2 class="text-sm font-bold text-white">📡 Nhật Ký Hoạt Động Toàn Sàn</h2>
+          <div id="activity-feed" class="space-y-2 max-h-[72vh] overflow-y-auto"></div>
         </div>
       </section>
 
-      <!-- 3. TAB QUẢN LÝ THÀNH VIÊN & DOANH THU TỪNG NGƯỜI -->
+      <!-- 3. NHÂN SỰ & QUỸ CỌC CHECKSCAM -->
       <section id="tab-users" class="hidden view-anim space-y-4">
         <div class="glass rounded-2xl p-4 space-y-3">
-          <div class="flex items-center justify-between">
-            <h2 class="text-sm font-bold text-white">👥 Nhân Sự & Doanh Thu Từng Người</h2>
-            <span id="users-count-badge" class="text-[11px] text-blue-400 font-bold">0 người</span>
-          </div>
-          <input id="search-user" oninput="filterUsers()" placeholder="🔍 Tìm tên, username hoặc Telegram ID..." class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none focus:border-blue-500" />
-          <div id="users-list" class="space-y-2.5 max-h-[68vh] overflow-y-auto pr-1"></div>
+          <h2 class="text-sm font-bold text-white">👥 Quản Lý Nhân Sự, Cọc CheckScam & Doanh Thu</h2>
+          <input id="search-user" oninput="filterUsers()" placeholder="🔍 Tìm tên hoặc Telegram ID..." class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none" />
+          <div id="users-list" class="space-y-2.5 max-h-[68vh] overflow-y-auto"></div>
         </div>
       </section>
 
-      <!-- 4. TAB QUẦY SHOP, SẢN PHẨM & KHO HÀNG -->
+      <!-- 4. SHOP, ĐĂNG SẢN PHẨM (CÓ ẢNH) & NẠP KHO -->
       <section id="tab-shops" class="hidden view-anim space-y-4">
         <div class="glass rounded-2xl p-4 space-y-3">
           <h2 class="text-sm font-bold text-white">🏪 Mở Quầy Hàng Mới</h2>
-          <input id="shop-name" placeholder="Tên quầy (VD: Quầy Tài Khoản AI & Netflix)" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none" />
+          <input id="shop-name" placeholder="Tên quầy hàng" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none" />
           <input id="shop-owner-id" placeholder="Telegram ID chủ quầy (để trống nếu là của bạn)" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none" />
-          <button onclick="createShop()" class="w-full bg-blue-600 hover:bg-blue-500 active:scale-95 py-2.5 rounded-xl text-xs font-bold text-white">+ Kích Hoạt Quầy Hàng</button>
+          <button onclick="createShop()" class="w-full bg-blue-600 py-2.5 rounded-xl text-xs font-bold text-white">+ Kích Hoạt Quầy Hàng</button>
         </div>
 
         <div class="glass rounded-2xl p-4 space-y-3">
           <h2 class="text-sm font-bold text-white">🛍 Đăng Sản Phẩm Mới Lên Website</h2>
           <select id="ev-shop" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none text-slate-200"></select>
-          <input id="ev-title" placeholder="Tên sản phẩm bán ra" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none" />
+          <input id="ev-title" placeholder="Tên sản phẩm (VD: Canva Pro 1 Năm Chính Chủ)" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none" />
+          <input id="ev-img" placeholder="Link ảnh bìa sản phẩm (https://...jpg/png)" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none" />
           <div class="grid grid-cols-2 gap-2">
             <input id="ev-price" type="number" placeholder="Giá bán (VNĐ)" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none" />
-            <input id="ev-ctv" type="number" placeholder="% Hoa hồng CTV (VD: 15)" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none" />
+            <input id="ev-ctv" type="number" placeholder="% Hoa hồng CTV" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none" />
           </div>
-          <textarea id="ev-desc" rows="2" placeholder="Mô tả chi tiết & chế độ bảo hành..." class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none"></textarea>
-          <button onclick="createEvent()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 py-2.5 rounded-xl text-xs font-bold text-white">🚀 Đăng Bán Lên Web</button>
+          <select id="ev-delivery" onchange="document.getElementById('ev-input-label').classList.toggle('hidden', this.value === 'auto')" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none text-slate-200">
+            <option value="auto">⚡ Giao tự động 3s (Lấy Key/Link từ kho)</option>
+            <option value="manual">🛠 Nâng cấp / Giao file thủ công (Khách nhập Email/Yêu cầu)</option>
+          </select>
+          <input id="ev-input-label" placeholder="Nhãn ô nhập cho khách (VD: Nhập Email Canva cần nâng cấp)" class="hidden w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-blue-500/40 outline-none" />
+          <textarea id="ev-desc" rows="2" placeholder="Mô tả chi tiết & bảo hành..." class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none"></textarea>
+          <button onclick="createEvent()" class="w-full bg-emerald-600 py-2.5 rounded-xl text-xs font-bold text-white">🚀 Đăng Bán Lên Web</button>
         </div>
 
-        <!-- NẠP KHO & VOUCHER -->
         <div class="glass rounded-2xl p-4 space-y-3">
           <h2 class="text-sm font-bold text-white">📦 Nạp Kho Hàng Tự Động</h2>
           <select id="st-event" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none text-slate-200"></select>
-          <textarea id="st-lines" rows="4" placeholder="Mỗi dòng 1 tài khoản / mã Key..." class="w-full bg-slate-950 font-mono text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none"></textarea>
-          <button onclick="addStock()" class="w-full bg-indigo-600 hover:bg-indigo-500 active:scale-95 py-2.5 rounded-xl text-xs font-bold text-white">📥 Nạp Vào Kho</button>
+          <textarea id="st-lines" rows="4" placeholder="Mỗi dòng 1 tài khoản / key / link tải file..." class="w-full bg-slate-950 font-mono text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none"></textarea>
+          <button onclick="addStock()" class="w-full bg-indigo-600 py-2.5 rounded-xl text-xs font-bold text-white">📥 Nạp Vào Kho</button>
         </div>
 
-        <div class="glass rounded-2xl p-4 space-y-2.5">
-          <h3 class="text-xs font-bold text-slate-300 uppercase">Danh sách sản phẩm & tồn kho</h3>
+        <div class="glass rounded-2xl p-4 space-y-2">
+          <h3 class="text-xs font-bold text-slate-300 uppercase">Sản phẩm đang mở bán</h3>
           <div id="events-admin-list" class="space-y-2"></div>
         </div>
       </section>
 
-      <!-- 5. TAB DÒNG TIỀN, VOUCHER & RÚT TIỀN -->
+      <!-- 5. DÒNG TIỀN & VOUCHER -->
       <section id="tab-finance" class="hidden view-anim space-y-4">
         <div class="glass rounded-2xl p-4 space-y-3">
-          <h2 class="text-sm font-bold text-white">💸 Tạo Lệnh Rút Tiền Về Ngân Hàng</h2>
+          <h2 class="text-sm font-bold text-white">💸 Tạo Lệnh Rút Tiền</h2>
           <input id="wd-amt" type="number" placeholder="Số tiền rút (VNĐ)" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none" />
-          <input id="wd-info" placeholder="Tên Ngân Hàng + Số Tài Khoản + Chủ TK" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none" />
-          <button onclick="sendWithdraw()" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-95 py-2.5 rounded-xl text-xs font-bold text-white">Gửi Lệnh Rút Tiền</button>
+          <input id="wd-info" placeholder="Ngân Hàng + Số Tài Khoản + Chủ TK" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none" />
+          <button onclick="sendWithdraw()" class="w-full bg-emerald-600 py-2.5 rounded-xl text-xs font-bold text-white">Gửi Lệnh Rút Tiền</button>
         </div>
 
-        <!-- VOUCHER -->
         <div class="glass rounded-2xl p-4 space-y-3">
-          <h2 class="text-sm font-bold text-white">🎟 Phát Hành Mã Giảm Giá (Voucher)</h2>
-          <input id="vc-code" placeholder="Mã Voucher (VD: SIEUSALE50)" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none uppercase" />
+          <h2 class="text-sm font-bold text-white">🎟 Tạo Mã Giảm Giá (Voucher)</h2>
+          <input id="vc-code" placeholder="Mã Voucher (VD: SALE50K)" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none uppercase" />
           <div class="grid grid-cols-2 gap-2">
             <input id="vc-amount" type="number" placeholder="Số tiền giảm (VNĐ)" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none" />
-            <input id="vc-uses" type="number" placeholder="Lượt dùng tối đa" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none" />
+            <input id="vc-uses" type="number" placeholder="Lượt dùng" class="w-full bg-slate-950 text-xs px-3 py-2.5 rounded-xl border border-slate-800 outline-none" />
           </div>
-          <button onclick="addVoucher()" class="w-full bg-violet-600 hover:bg-violet-500 active:scale-95 py-2.5 rounded-xl text-xs font-bold text-white">✨ Kích Hoạt Voucher</button>
+          <button onclick="addVoucher()" class="w-full bg-violet-600 py-2.5 rounded-xl text-xs font-bold text-white">✨ Kích Hoạt Voucher</button>
         </div>
 
-        <!-- DUYỆT RÚT TIỀN -->
         <div class="admin-only hidden glass rounded-2xl p-4 space-y-2.5 border-amber-500/30">
           <h3 class="text-xs font-bold text-amber-400 uppercase">🏦 Lệnh Rút Tiền Chờ Duyệt</h3>
           <div id="withdraw-list" class="space-y-2"></div>
         </div>
 
-        <!-- LỊCH SỬ ĐƠN HÀNG -->
-        <div class="glass rounded-2xl p-4 space-y-2.5">
-          <h3 class="text-xs font-bold text-slate-300 uppercase">🧾 Lịch Sử Đơn Hàng Toàn Sàn</h3>
+        <div class="glass rounded-2xl p-4 space-y-2">
+          <h3 class="text-xs font-bold text-slate-300 uppercase">🧾 Lịch Sử Đơn Hàng</h3>
           <div id="orders-list" class="space-y-2 max-h-80 overflow-y-auto"></div>
         </div>
       </section>
-
     </main>
 
-    <!-- BOTTOM NAVIGATION 5 TAB GỌN ĐẸP -->
     <nav class="fixed bottom-0 inset-x-0 z-40 bg-[#070b17]/95 backdrop-blur-xl border-t border-slate-800/90 px-1 py-1.5 flex justify-around">
-      <button onclick="goTab('overview')" id="nav-overview" class="nav-item active flex flex-col items-center gap-0.5 py-1 px-2 text-slate-400">
-        <span class="ico px-2.5 py-1 rounded-xl text-xs transition">📊</span>
-        <span class="text-[9px] font-bold">Tổng quan</span>
-      </button>
-      <button onclick="goTab('activity')" id="nav-activity" class="admin-only hidden nav-item flex flex-col items-center gap-0.5 py-1 px-2 text-slate-400">
-        <span class="ico px-2.5 py-1 rounded-xl text-xs transition">📡</span>
-        <span class="text-[9px] font-bold">Hoạt động</span>
-      </button>
-      <button onclick="goTab('users')" id="nav-users" class="admin-only hidden nav-item flex flex-col items-center gap-0.5 py-1 px-2 text-slate-400">
-        <span class="ico px-2.5 py-1 rounded-xl text-xs transition">👥</span>
-        <span class="text-[9px] font-bold">Nhân sự</span>
-      </button>
-      <button onclick="goTab('shops')" id="nav-shops" class="nav-item flex flex-col items-center gap-0.5 py-1 px-2 text-slate-400">
-        <span class="ico px-2.5 py-1 rounded-xl text-xs transition">🏪</span>
-        <span class="text-[9px] font-bold">Shop/Kho</span>
-      </button>
-      <button onclick="goTab('finance')" id="nav-finance" class="nav-item flex flex-col items-center gap-0.5 py-1 px-2 text-slate-400">
-        <span class="ico px-2.5 py-1 rounded-xl text-xs transition">💸</span>
-        <span class="text-[9px] font-bold">Dòng tiền</span>
-      </button>
+      <button onclick="goTab('overview')" id="nav-overview" class="nav-item active flex flex-col items-center gap-0.5 py-1 px-2 text-slate-400"><span class="ico px-2.5 py-1 rounded-xl text-xs">📊</span><span class="text-[9px] font-bold">Tổng quan</span></button>
+      <button onclick="goTab('activity')" id="nav-activity" class="admin-only hidden nav-item flex flex-col items-center gap-0.5 py-1 px-2 text-slate-400"><span class="ico px-2.5 py-1 rounded-xl text-xs">📡</span><span class="text-[9px] font-bold">Hoạt động</span></button>
+      <button onclick="goTab('users')" id="nav-users" class="admin-only hidden nav-item flex flex-col items-center gap-0.5 py-1 px-2 text-slate-400"><span class="ico px-2.5 py-1 rounded-xl text-xs">👥</span><span class="text-[9px] font-bold">Nhân sự</span></button>
+      <button onclick="goTab('shops')" id="nav-shops" class="nav-item flex flex-col items-center gap-0.5 py-1 px-2 text-slate-400"><span class="ico px-2.5 py-1 rounded-xl text-xs">🏪</span><span class="text-[9px] font-bold">Shop/Kho</span></button>
+      <button onclick="goTab('finance')" id="nav-finance" class="nav-item flex flex-col items-center gap-0.5 py-1 px-2 text-slate-400"><span class="ico px-2.5 py-1 rounded-xl text-xs">💸</span><span class="text-[9px] font-bold">Dòng tiền</span></button>
     </nav>
-  </div>
-
-  <!-- MODAL XEM CHI TIẾT DOANH THU & HOẠT ĐỘNG TỪNG NGƯỜI -->
-  <div id="user-detail-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="glass bg-slate-900 rounded-2xl max-w-md w-full p-5 space-y-4 relative">
-      <button onclick="document.getElementById('user-detail-modal').classList.add('hidden')" class="absolute top-3 right-3 text-slate-400 hover:text-white">✕</button>
-      <div id="user-detail-content" class="space-y-3"></div>
-    </div>
   </div>
 
   <script>
     const API_BASE = "https://he-thong-tong-api.namalo1608.workers.dev";
     const tg = window.Telegram?.WebApp;
-    let isAdmin = false;
-    let allUsers = [];
-    let allOrders = [];
-    let allShops = [];
+    let isAdmin = false, allUsers = [], allOrders = [], allShops = [];
 
     function goTab(id) {
-      tg?.HapticFeedback?.selectionChanged();
       ["overview", "activity", "users", "shops", "finance"].forEach(t => {
         document.getElementById(`tab-${t}`).classList.add("hidden");
         document.getElementById(`nav-${t}`)?.classList.remove("active");
@@ -318,12 +209,9 @@
 
     async function boot() {
       if (!tg || !tg.initData) return;
-      tg.ready();
-      tg.expand();
-
+      tg.ready(); tg.expand();
       const res = await apiPost("/api/miniapp/profile");
       if (!res.success || !res.profile) return;
-
       const p = res.profile;
       isAdmin = p.role === "admin";
       document.getElementById("lock-screen").classList.add("hidden");
@@ -331,278 +219,191 @@
       document.getElementById("u-name").innerText = p.full_name || p.username || `ID ${p.telegram_id}`;
       document.getElementById("u-role").innerText = p.role;
       document.getElementById("u-balance").innerText = Number(p.available_balance || 0).toLocaleString() + "đ";
-      document.getElementById("u-deposit").innerText = p.is_deposit_verified ? "✅ Đã đóng cọc" : "⚠️ Chưa cọc";
+      document.getElementById("u-deposit").innerText = `🛡 Cọc: ${Number(p.deposit_amount || 0).toLocaleString()}đ`;
       document.getElementById("ref-url").value = `${window.location.origin}/?ref=${p.ref_code}`;
-
-      if (isAdmin) {
-        document.querySelectorAll(".admin-only").forEach(el => el.classList.remove("hidden"));
-      }
+      if (isAdmin) document.querySelectorAll(".admin-only").forEach(el => el.classList.remove("hidden"));
       refreshAll();
     }
 
     async function refreshAll() {
-      tg?.HapticFeedback?.impactOccurred("light");
       const data = await apiPost("/api/miniapp/dashboard-data");
       if (!data.success) return;
-
-      allUsers = data.users || [];
-      allShops = data.shops || [];
-      const events = data.events || [];
-      allOrders = data.orders || [];
-      const withdraws = data.withdraws || [];
-      const stockCount = data.stockCount || 0;
-      const activities = data.activities || [];
-
-      // Tính tổng doanh thu các đơn đã hoàn tất
-      const completedOrders = allOrders.filter(o => o.status === "completed");
-      const totalRev = completedOrders.reduce((sum, o) => sum + Number(o.final_amount || 0), 0);
+      allUsers = data.users || []; allShops = data.shops || []; allOrders = data.orders || [];
+      const events = data.events || [], withdraws = data.withdraws || [], activities = data.activities || [];
+      const completed = allOrders.filter(o => o.status === "completed");
+      const totalRev = completed.reduce((s, o) => s + Number(o.final_amount || 0), 0);
 
       document.getElementById("st-total-rev").innerText = totalRev.toLocaleString() + "đ";
       document.getElementById("st-users").innerText = allUsers.length;
       document.getElementById("st-shops").innerText = allShops.length;
-      document.getElementById("st-stock").innerText = stockCount;
-      document.getElementById("st-orders").innerText = completedOrders.length;
-      document.getElementById("users-count-badge").innerText = `${allUsers.length} thành viên`;
+      document.getElementById("st-stock").innerText = data.stockCount || 0;
+      document.getElementById("st-orders").innerText = completed.length;
 
-      // Tính doanh thu & số đơn chi tiết cho từng thành viên
-      allUsers = allUsers.map(u => {
-        const refOrders = completedOrders.filter(o => o.ctv_ref_code && o.ctv_ref_code === u.ref_code);
-        const ownedShopIds = allShops.filter(s => String(s.owner_telegram_id) === String(u.telegram_id)).map(s => s.id);
-        const shopOrders = completedOrders.filter(o => ownedShopIds.includes(o.shop_id));
-        const personalRev = [...refOrders, ...shopOrders].reduce((s, o) => s + Number(o.final_amount || 0), 0);
-        return {
-          ...u,
-          calc_orders: refOrders.length + shopOrders.length,
-          calc_revenue: personalRev
-        };
-      });
+      // Đơn thủ công đang chờ bàn giao
+      const procOrders = allOrders.filter(o => o.status === "processing");
+      document.getElementById("processing-orders-list").innerHTML = procOrders.map(o => `
+        <div class="bg-slate-950 p-3 rounded-xl border border-amber-500/30 space-y-2 text-xs">
+          <div class="flex justify-between"><b class="text-blue-400">#${o.order_code}</b><b class="text-emerald-400">${Number(o.final_amount).toLocaleString()}đ</b></div>
+          <p class="text-[11px] text-slate-300">Khách yêu cầu: <b class="text-white">${o.buyer_note || "Không có ghi chú"}</b></p>
+          <button onclick="completeManual('${o.order_code}')" class="w-full bg-emerald-600 py-1.5 rounded-lg font-bold text-white">✅ Nhập Link/Kết Quả & Bàn Giao</button>
+        </div>
+      `).join("") || `<p class="text-xs text-slate-500 text-center py-2">Không có đơn chờ bàn giao.</p>`;
 
-      // Dropdown Shop & Event
-      document.getElementById("ev-shop").innerHTML = allShops.map(s => `<option value="${s.id}">🏪 ${s.shop_name}</option>`).join("") || `<option value="">Chưa có quầy nào</option>`;
-      document.getElementById("st-event").innerHTML = events.map(e => `<option value="${e.id}">${e.title} (${Number(e.price).toLocaleString()}đ)</option>`).join("");
+      document.getElementById("ev-shop").innerHTML = allShops.map(s => `<option value="${s.id}">🏪 ${s.shop_name}</option>`).join("");
+      document.getElementById("st-event").innerHTML = events.map(e => `<option value="${e.id}">${e.title}</option>`).join("");
 
-      // Danh sách sản phẩm
       document.getElementById("events-admin-list").innerHTML = events.map(e => `
         <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800 flex items-center justify-between gap-2">
           <div>
             <p class="text-xs font-bold text-white">${e.title}</p>
-            <p class="text-[10px] text-slate-400">Giá: <b class="text-emerald-400">${Number(e.price).toLocaleString()}đ</b> • Hoa hồng CTV: ${e.ctv_commission_percent || 0}%</p>
+            <p class="text-[10px] text-slate-400">${Number(e.price).toLocaleString()}đ • ${e.delivery_type === 'manual' ? '🛠 Thủ công' : '⚡ Tự động'}</p>
           </div>
           ${isAdmin ? `<button onclick="deleteEvent('${e.id}')" class="text-rose-400 bg-rose-500/10 px-2.5 py-1.5 rounded-lg text-[10px] font-bold">Xóa</button>` : ""}
         </div>
-      `).join("") || `<p class="text-xs text-slate-500 text-center py-2">Chưa có sản phẩm.</p>`;
+      `).join("");
 
-      // Danh sách đơn hàng
       document.getElementById("orders-list").innerHTML = allOrders.map(o => `
         <div class="bg-slate-950/80 p-3 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
-          <div>
-            <p class="font-bold text-blue-400">#${o.order_code} <span class="text-[10px] text-slate-500 font-normal">(${new Date(o.created_at).toLocaleString("vi-VN")})</span></p>
-            <p class="text-[10px] text-slate-400">Giá trị: <b class="text-white">${Number(o.final_amount).toLocaleString()}đ</b> ${o.ctv_ref_code ? `• Ref: ${o.ctv_ref_code}` : ""}</p>
-          </div>
-          <span class="px-2 py-0.5 rounded text-[10px] font-bold ${o.status === 'completed' ? 'bg-emerald-500/20 text-emerald-400' : 'bg-amber-500/20 text-amber-400'}">${o.status}</span>
+          <div><p class="font-bold text-blue-400">#${o.order_code}</p><p class="text-[10px] text-slate-400">${Number(o.final_amount).toLocaleString()}đ</p></div>
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-800 text-emerald-400">${o.status}</span>
         </div>
-      `).join("") || `<p class="text-xs text-slate-500 text-center py-2">Chưa có đơn hàng.</p>`;
+      `).join("");
 
       if (isAdmin) {
-        // Bảng xếp hạng Top Doanh Thu
-        const sortedEarners = [...allUsers].sort((a, b) => b.calc_revenue - a.calc_revenue).slice(0, 5);
-        document.getElementById("top-earners-list").innerHTML = sortedEarners.map((u, idx) => `
-          <div onclick="openUserDetail('${u.telegram_id}')" class="cursor-pointer bg-slate-950/80 hover:bg-slate-900 p-2.5 rounded-xl border border-slate-800 flex items-center justify-between text-xs">
-            <div class="flex items-center gap-2">
-              <span class="w-5 h-5 rounded-full bg-amber-500/20 text-amber-400 font-bold text-[10px] flex items-center justify-center">${idx + 1}</span>
-              <div>
-                <p class="font-bold text-white">${u.full_name || u.username || u.telegram_id}</p>
-                <p class="text-[10px] text-slate-400">${u.role.toUpperCase()} • ${u.calc_orders} đơn thành công</p>
-              </div>
-            </div>
-            <div class="text-right">
-              <p class="font-extrabold text-emerald-400">${u.calc_revenue.toLocaleString()}đ</p>
-              <p class="text-[9px] text-blue-400">Bấm soi chi tiết →</p>
-            </div>
+        allUsers = allUsers.map(u => {
+          const rev = completed.filter(o => o.ctv_ref_code === u.ref_code).reduce((s, o) => s + Number(o.final_amount || 0), 0);
+          return { ...u, calc_rev: rev };
+        });
+        document.getElementById("top-earners-list").innerHTML = [...allUsers].sort((a, b) => b.calc_rev - a.calc_rev).slice(0, 5).map(u => `
+          <div class="bg-slate-950 p-2.5 rounded-xl border border-slate-800 flex justify-between text-xs">
+            <span><b>${u.full_name || u.telegram_id}</b> <span class="text-slate-500">(${u.role})</span></span>
+            <b class="text-emerald-400">${u.calc_rev.toLocaleString()}đ</b>
           </div>
-        `).join("") || `<p class="text-xs text-slate-500">Chưa có dữ liệu.</p>`;
+        `).join("");
 
-        // Luồng hoạt động trực tiếp (Activity Feed)
-        document.getElementById("activity-feed").innerHTML = activities.map(act => `
-          <div class="bg-slate-950/90 p-3 rounded-xl border border-slate-800/90 flex items-start gap-2.5 text-xs">
-            <span class="text-base mt-0.5">${act.icon || "⚡"}</span>
-            <div class="flex-1">
-              <p class="text-slate-200 font-medium leading-snug">${act.text}</p>
-              <p class="text-[10px] text-slate-500 mt-1">${new Date(act.time).toLocaleString("vi-VN")}</p>
-            </div>
+        document.getElementById("activity-feed").innerHTML = activities.map(a => `
+          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800 text-xs">
+            <p class="text-slate-200">${a.description}</p>
+            <p class="text-[10px] text-slate-500 mt-1">${new Date(a.created_at).toLocaleString("vi-VN")}</p>
           </div>
-        `).join("") || `<p class="text-xs text-slate-500 text-center py-4">Chưa ghi nhận hoạt động nào.</p>`;
+        `).join("");
 
         renderUsers(allUsers);
-
         document.getElementById("withdraw-list").innerHTML = withdraws.filter(w => w.status === "pending").map(w => `
           <div class="bg-slate-950 p-3 rounded-xl border border-amber-500/30 space-y-2 text-xs">
-            <div class="flex justify-between">
-              <b class="text-white">ID: ${w.user_telegram_id}</b>
-              <b class="text-emerald-400">${Number(w.amount).toLocaleString()}đ</b>
-            </div>
+            <div class="flex justify-between"><b>ID: ${w.user_telegram_id}</b><b class="text-emerald-400">${Number(w.amount).toLocaleString()}đ</b></div>
             <p class="text-[11px] text-slate-300">${w.bank_info}</p>
             <div class="flex gap-2">
-              <button onclick="approveWithdraw('${w.id}', 'approved')" class="flex-1 bg-emerald-600 py-1.5 rounded-lg font-bold text-white">✅ Duyệt chi</button>
-              <button onclick="approveWithdraw('${w.id}', 'rejected')" class="flex-1 bg-rose-600 py-1.5 rounded-lg font-bold text-white">❌ Từ chối</button>
+              <button onclick="approveWithdraw('${w.id}', 'approved')" class="flex-1 bg-emerald-600 py-1.5 rounded-lg font-bold">✅ Duyệt</button>
+              <button onclick="approveWithdraw('${w.id}', 'rejected')" class="flex-1 bg-rose-600 py-1.5 rounded-lg font-bold">❌ Hủy</button>
             </div>
           </div>
-        `).join("") || `<p class="text-xs text-slate-500 text-center py-2">Không có lệnh rút chờ duyệt.</p>`;
+        `).join("");
       }
     }
 
     function renderUsers(list) {
       document.getElementById("users-list").innerHTML = list.map(u => `
-        <div class="bg-slate-950/90 p-3.5 rounded-xl border border-slate-800 space-y-2.5">
-          <div onclick="openUserDetail('${u.telegram_id}')" class="cursor-pointer flex justify-between items-start">
+        <div class="bg-slate-950 p-3.5 rounded-xl border border-slate-800 space-y-2">
+          <div class="flex justify-between items-start">
             <div>
-              <p class="text-xs font-bold text-white">${u.full_name || u.username || "Người dùng"} <span class="text-slate-500">(${u.telegram_id})</span></p>
-              <p class="text-[11px] text-slate-300 mt-1">
-                Doanh số: <b class="text-amber-400">${u.calc_revenue.toLocaleString()}đ</b> (${u.calc_orders} đơn) • Ví: <b class="text-emerald-400">${Number(u.available_balance || 0).toLocaleString()}đ</b>
-              </p>
+              <p class="text-xs font-bold text-white">${u.full_name || u.telegram_id} <span class="text-slate-500">(${u.telegram_id})</span></p>
+              <p class="text-[11px] text-slate-300 mt-0.5">Cọc: <b class="text-cyan-400">${Number(u.deposit_amount || 0).toLocaleString()}đ</b> • Ví: <b class="text-emerald-400">${Number(u.available_balance || 0).toLocaleString()}đ</b></p>
             </div>
-            <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-blue-500/20 text-blue-400 uppercase">${u.role}</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/20 text-blue-400 uppercase">${u.role}</span>
           </div>
-          <div class="grid grid-cols-4 gap-1.5 pt-1 border-t border-slate-800/80">
-            <button onclick="openUserDetail('${u.telegram_id}')" class="bg-blue-600/20 text-blue-400 py-1.5 rounded-lg text-[10px] font-bold">📊 Soi đơn</button>
-            <button onclick="updateUser('${u.telegram_id}', 'role')" class="bg-slate-800 py-1.5 rounded-lg text-[10px] font-semibold">🎭 Quyền</button>
-            <button onclick="updateUser('${u.telegram_id}', 'deposit')" class="bg-slate-800 py-1.5 rounded-lg text-[10px] font-semibold">${u.is_deposit_verified ? "✅ Cọc" : "⚠️ Cọc"}</button>
-            <button onclick="updateUser('${u.telegram_id}', 'balance')" class="bg-slate-800 py-1.5 rounded-lg text-[10px] font-semibold">💰 Ví</button>
-          </div>
-        </div>
-      `).join("") || `<p class="text-xs text-slate-500 text-center py-3">Không tìm thấy thành viên.</p>`;
-    }
-
-    // Bấm vào từng người để soi lịch sử đơn hàng & doanh thu của riêng người đó
-    function openUserDetail(tgId) {
-      const u = allUsers.find(x => String(x.telegram_id) === String(tgId));
-      if (!u) return;
-      const ownedShopIds = allShops.filter(s => String(s.owner_telegram_id) === String(u.telegram_id)).map(s => s.id);
-      const userOrders = allOrders.filter(o => (o.ctv_ref_code && o.ctv_ref_code === u.ref_code) || ownedShopIds.includes(o.shop_id));
-
-      document.getElementById("user-detail-content").innerHTML = `
-        <h3 class="font-bold text-base text-white">📊 Hồ Sơ Hoạt Động: ${u.full_name || u.telegram_id}</h3>
-        <div class="grid grid-cols-2 gap-2 text-xs">
-          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
-            <p class="text-slate-400 text-[10px]">Tổng doanh thu tạo ra</p>
-            <p class="font-extrabold text-amber-400 text-sm mt-0.5">${u.calc_revenue.toLocaleString()}đ</p>
-          </div>
-          <div class="bg-slate-950 p-3 rounded-xl border border-slate-800">
-            <p class="text-slate-400 text-[10px]">Số dư khả dụng hiện tại</p>
-            <p class="font-extrabold text-emerald-400 text-sm mt-0.5">${Number(u.available_balance || 0).toLocaleString()}đ</p>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button onclick="updateUser('${u.telegram_id}', 'role')" class="bg-slate-800 py-1.5 rounded-lg text-[10px]">🎭 Quyền</button>
+            <button onclick="updateUser('${u.telegram_id}', 'deposit')" class="bg-slate-800 py-1.5 rounded-lg text-[10px]">🛡 Tiền cọc</button>
+            <button onclick="updateUser('${u.telegram_id}', 'balance')" class="bg-slate-800 py-1.5 rounded-lg text-[10px]">💰 Cộng/Trừ ví</button>
           </div>
         </div>
-        <p class="text-[11px] text-slate-400">Mã giới thiệu: <b class="text-blue-400">${u.ref_code}</b> • Trạng thái cọc: <b>${u.is_deposit_verified ? "Đã đóng cọc" : "Chưa đóng cọc"}</b></p>
-        <div class="space-y-1.5">
-          <p class="text-xs font-bold text-slate-300">Danh sách đơn hàng của người này (${userOrders.length} đơn):</p>
-          <div class="max-h-48 overflow-y-auto space-y-1.5">
-            ${userOrders.map(o => `
-              <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 flex justify-between text-[11px]">
-                <span class="text-blue-400 font-bold">#${o.order_code}</span>
-                <span class="text-white font-semibold">${Number(o.final_amount).toLocaleString()}đ</span>
-                <span class="${o.status === 'completed' ? 'text-emerald-400' : 'text-amber-400'}">${o.status}</span>
-              </div>
-            `).join("") || `<p class="text-xs text-slate-500">Người này chưa phát sinh đơn hàng nào.</p>`}
-          </div>
-        </div>
-      `;
-      document.getElementById("user-detail-modal").classList.remove("hidden");
+      `).join("");
     }
 
     function filterUsers() {
       const q = document.getElementById("search-user").value.toLowerCase();
-      renderUsers(allUsers.filter(u =>
-        String(u.telegram_id).includes(q) ||
-        (u.full_name || "").toLowerCase().includes(q) ||
-        (u.username || "").toLowerCase().includes(q)
-      ));
+      renderUsers(allUsers.filter(u => String(u.telegram_id).includes(q) || (u.full_name || "").toLowerCase().includes(q)));
     }
 
-    async function updateUser(targetId, action) {
-      let payload = { target_telegram_id: targetId, action };
-      if (action === "role") {
-        const r = prompt("Nhập vai trò mới (ctv / shop / admin / banned):");
-        if (!r) return;
-        payload.value = r.trim().toLowerCase();
-      } else if (action === "balance") {
-        const amt = prompt("Nhập số tiền muốn cộng (VD: 50000) hoặc trừ (VD: -20000):");
-        if (!amt) return;
-        payload.value = Number(amt);
-      }
-      const res = await apiPost("/api/miniapp/admin-user-action", payload);
-      alert(res.message || "Đã cập nhật!");
-      refreshAll();
+    async function updateUser(id, action) {
+      let value;
+      if (action === "role") value = prompt("Nhập vai trò (ctv / shop / admin / banned):")?.trim().toLowerCase();
+      if (action === "deposit") value = prompt("Nhập số tiền Quỹ Bảo Hiểm đã cọc (VD: 5000000):");
+      if (action === "balance") value = prompt("Nhập số tiền cộng (VD: 50000) hoặc trừ (VD: -20000):");
+      if (value === null || value === undefined || value === "") return;
+      const res = await apiPost("/api/miniapp/admin-user-action", { target_telegram_id: id, action, value });
+      alert(res.message); refreshAll();
+    }
+
+    async function completeManual(order_code) {
+      const delivery_result = prompt("Nhập Link tải file hoặc thông báo hoàn tất gửi cho khách:");
+      if (!delivery_result) return;
+      const res = await apiPost("/api/miniapp/complete-manual-order", { order_code, delivery_result });
+      alert(res.message); refreshAll();
     }
 
     async function createShop() {
       const shop_name = document.getElementById("shop-name").value.trim();
       const owner_telegram_id = document.getElementById("shop-owner-id").value.trim();
-      if (!shop_name) return alert("Nhập tên quầy hàng!");
+      if (!shop_name) return alert("Nhập tên quầy!");
       const res = await apiPost("/api/miniapp/create-shop", { shop_name, owner_telegram_id });
-      alert(res.message || "Đã tạo quầy!");
-      document.getElementById("shop-name").value = "";
-      refreshAll();
+      alert(res.message); refreshAll();
     }
 
     async function createEvent() {
-      const shop_id = document.getElementById("ev-shop").value;
-      const title = document.getElementById("ev-title").value.trim();
-      const price = Number(document.getElementById("ev-price").value);
-      const ctv_commission_percent = Number(document.getElementById("ev-ctv").value || 0);
-      const description = document.getElementById("ev-desc").value.trim();
-      if (!shop_id || !title || !price) return alert("Chọn quầy, nhập tên và giá sản phẩm!");
-      const res = await apiPost("/api/miniapp/create-event", { shop_id, title, price, ctv_commission_percent, description });
-      alert(res.message || "Đã đăng sản phẩm!");
-      refreshAll();
+      const payload = {
+        shop_id: document.getElementById("ev-shop").value,
+        title: document.getElementById("ev-title").value.trim(),
+        image_url: document.getElementById("ev-img").value.trim(),
+        price: Number(document.getElementById("ev-price").value),
+        ctv_commission_percent: Number(document.getElementById("ev-ctv").value || 0),
+        delivery_type: document.getElementById("ev-delivery").value,
+        input_label: document.getElementById("ev-input-label").value.trim() || "Email hoặc thông tin nhận hàng",
+        description: document.getElementById("ev-desc").value.trim()
+      };
+      if (!payload.shop_id || !payload.title) return alert("Nhập đủ thông tin!");
+      const res = await apiPost("/api/miniapp/create-event", payload);
+      alert(res.message); refreshAll();
     }
 
     async function deleteEvent(event_id) {
-      if (!confirm("Xóa sản phẩm này khỏi sàn?")) return;
+      if (!confirm("Xóa sản phẩm này?")) return;
       const res = await apiPost("/api/miniapp/delete-event", { event_id });
-      alert(res.message || "Đã xóa!");
-      refreshAll();
+      alert(res.message); refreshAll();
     }
 
     async function addStock() {
       const event_id = document.getElementById("st-event").value;
       const items = document.getElementById("st-lines").value.split("\n").map(x => x.trim()).filter(Boolean);
-      if (!event_id || !items.length) return alert("Chọn sản phẩm và nhập danh sách hàng!");
+      if (!event_id || !items.length) return alert("Nhập dữ liệu kho!");
       const res = await apiPost("/api/miniapp/add-inventory", { event_id, items });
-      alert(res.message || `Đã nạp ${items.length} sản phẩm vào kho!`);
-      document.getElementById("st-lines").value = "";
-      refreshAll();
+      alert(res.message); document.getElementById("st-lines").value = ""; refreshAll();
     }
 
     async function addVoucher() {
-      const code = document.getElementById("vc-code").value.trim().toUpperCase();
+      const code = document.getElementById("vc-code").value.trim();
       const discount_amount = Number(document.getElementById("vc-amount").value);
       const max_uses = Number(document.getElementById("vc-uses").value || 50);
-      if (!code || !discount_amount) return alert("Nhập mã và số tiền giảm!");
       const res = await apiPost("/api/miniapp/create-voucher", { code, discount_amount, max_uses });
-      alert(res.message || "Đã tạo mã giảm giá!");
+      alert(res.message);
     }
 
     async function sendWithdraw() {
       const amount = Number(document.getElementById("wd-amt").value);
       const bank_info = document.getElementById("wd-info").value.trim();
-      if (!amount || !bank_info) return alert("Nhập số tiền và thông tin ngân hàng!");
       const res = await apiPost("/api/miniapp/withdraw", { amount, bank_info });
-      alert(res.message || "Đã gửi yêu cầu rút tiền!");
-      refreshAll();
+      alert(res.message); refreshAll();
     }
 
     async function approveWithdraw(withdraw_id, status) {
       const res = await apiPost("/api/miniapp/approve-withdraw", { withdraw_id, status });
-      alert(res.message || "Đã xử lý lệnh rút!");
-      refreshAll();
+      alert(res.message); refreshAll();
     }
 
     function copyRef() {
       const el = document.getElementById("ref-url");
-      el.select();
-      navigator.clipboard.writeText(el.value);
-      tg?.HapticFeedback?.notificationOccurred("success");
-      alert("Đã sao chép link giới thiệu!");
+      el.select(); navigator.clipboard.writeText(el.value); alert("Đã copy link!");
     }
 
     boot();
